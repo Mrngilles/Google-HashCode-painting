@@ -118,6 +118,66 @@ def search_rectangle(map_lines, num_rows, num_cols):
 				return left, right, top, bottom
 	return left, right, top, bottom
 
+def process_rectangle(map_lines, wall, l, r, t, b):
+	# print 'process_rectangle'
+	list_squares = []
+
+	w = r - l + 1
+	h = b - t + 1
+	m = min(w, h)
+	# print w, h
+
+	if m < 3:
+		# only need to draw at most 2 lines 
+		# if w < 3:
+		# TODO put into map_lines
+		clear_rectangle(l, r, t, b)
+	else:
+		if h > w:
+			# size of square must be an odd number
+			if w % 2 == 0:
+				w -= 1
+				r -= 1
+
+			k = 1
+			while t + w * k <= b:
+				radius = (w - 1) / 2
+				center = ( l + radius, t + radius + (k - 1) *w )
+				list_squares.append( (radius, center) )
+				k += 1
+
+		elif h < w:
+			# size of square must be an odd number
+			if h % 2 == 0:
+				h -= 1
+				b -= 1
+
+			k = 1
+			while l + h * k <= r:
+				radius = (h - 1) / 2
+				center = ( l + radius + (k - 1) * h, t + radius )
+				k += 1
+				list_squares.append( (radius, center) )
+
+		else:
+			# this is a square
+			# still need to adjust its size
+			if w % 2 == 0:
+				w -= 1
+
+			radius = (w - 1) / 2
+			center = ( l + radius, t + radius )
+			list_squares.append( (radius, center) )
+
+	# clear squares
+	for square in list_squares:
+		radius = square[0]
+		center = square[1]
+		print 'square ' + str(radius) + ', ' + str(center)
+		clear_rectangle(center[0] - radius, center[0] + radius, center[1] - radius, center[1] + radius)
+
+	return list_squares
+
 def clear_rectangle(left, right, top, bottom):
 	for row in range(top, bottom + 1):
 		l = list(wall[row])
@@ -144,14 +204,15 @@ def generate_output_file(map_lines, row_count, num_rows):
 # generate_output_file(map_lines, row_count, num_rows)
 
 wall, num_rows, num_cols = read_input()
-for i in range(20):
+for i in range(100):
 	row_count, map_lines = scan_lines(wall)
 	rect = search_rectangle(map_lines, num_rows, num_cols)
-	print rect
-	print 'width', rect[1] - rect[0] + 1
-	print 'height', rect[3] - rect[2] + 1
+	# print rect
+	# print 'width', rect[1] - rect[0] + 1
+	# print 'height', rect[3] - rect[2] + 1
+	process_rectangle(map_lines, wall, *rect)
 	print
-	clear_rectangle(*rect)
+	# clear_rectangle(*rect)
 	# for row in range(0, 10):
 	# 	print wall[row][0:20]
 	# print
