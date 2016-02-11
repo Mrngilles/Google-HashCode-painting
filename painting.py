@@ -1,8 +1,6 @@
 input_file = 'right_angle.in'
 output_file = 'right_angle.out'
 
-num_cols = 0
-
 # Read input
 def read_input():
 	wall = None
@@ -18,7 +16,7 @@ def read_input():
 					wall = [['.' for x in range(num_cols)] for x in range(num_rows)]
 				wall[count - 1] = line[0:-1]
 			count += 1
-	return wall, num_rows
+	return wall, num_rows, num_cols
 
 # scan for lines (horizontal)
 cells_cover_by_rows = 0
@@ -54,32 +52,34 @@ def scan_lines(wall):
 		map_lines[index] = list_lines
 	return row_count, map_lines
 
-# scan for lines (vertical)
-cells_cover_by_cols = 0
-col_count = 0
-for col in range(num_cols):
-	# print 'column ' + str(col)
-	start_position = -1
-	end_position = -1
-	for position in range(num_rows):
-		cell = wall[position][col]
-		if start_position == -1 and cell == '#':
-			start_position = position
-		
-		if (( (position + 1 < num_rows and wall[position + 1][col] == '.') or (position == num_rows - 1 and cell == '#') ) 
-			and start_position != -1 and end_position == -1):
-			end_position = position
-		
-		if start_position != -1 and end_position != -1:
-			# found a line
-			# print end_position - start_position + 1#, start_position, end_position
-			# print start_position, end_position
-			start_position = -1
-			end_position = -1
-			col_count += 1
-			# cells_cover_by_cols += (end_position - start_position + 1)
+def scan_columns(wall):
+	map_lines = dict()
+	col_count = 0
+	for col in range(num_cols):
+		list_lines = []
+		start_position = -1
+		end_position = -1
+		for position in range(num_rows):
+			cell = wall[position][col]
+			if start_position == -1 and cell == '#':
+				start_position = position
+			
+			if (( (position + 1 < num_rows and wall[position + 1][col] == '.') or (position == num_rows - 1 and cell == '#') ) 
+				and start_position != -1 and end_position == -1):
+				end_position = position
+			
+			if start_position != -1 and end_position != -1:
+				# found a line
+				# print end_position - start_position + 1#, start_position, end_position
+				# print start_position, end_position
+				start_position = -1
+				end_position = -1
+				col_count += 1
+				list_lines.append( (start_position, end_position) )
+		map_lines[col] = list_lines
+	return col_count
 
-def search_square(map_lines, num_rows):
+def search_square(map_lines, num_rows, num_cols):
 	# print map_lines
 	left = 0
 	right = num_cols - 1
@@ -139,16 +139,17 @@ def generate_output_file(map_lines, row_count, num_rows):
 
 # print 'row count', row_count
 # print 'col count', col_count
-wall, num_rows = read_input()
-row_count, map_lines = scan_lines(wall)
-generate_output_file(map_lines, row_count, num_rows)
+# wall, num_rows = read_input()
+# row_count, map_lines = scan_lines(wall)
+# generate_output_file(map_lines, row_count, num_rows)
 
-# for i in range(2):
-# 	scan_lines()
-# 	rect = search_square(map_lines)
-# 	# print rect
-# 	clear_rectangle(*rect)
-# 	for row in range(0, 10):
-# 		print wall[row][0:20]
-# 	print
+wall, num_rows, num_cols = read_input()
+for i in range(2):
+	ow_count, map_lines = scan_lines(wall)
+	rect = search_square(map_lines, num_rows, num_cols)
+	print rect
+	clear_rectangle(*rect)
+	for row in range(0, 10):
+		print wall[row][0:20]
+	print
 
