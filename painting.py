@@ -79,7 +79,7 @@ def scan_columns(wall):
 		map_lines[col] = list_lines
 	return col_count
 
-def search_square(map_lines, num_rows, num_cols):
+def search_rectangle(map_lines, num_rows, num_cols):
 	# print map_lines
 	left = 0
 	right = num_cols - 1
@@ -144,12 +144,15 @@ def generate_output_file(map_lines, row_count, num_rows):
 # generate_output_file(map_lines, row_count, num_rows)
 
 wall, num_rows, num_cols = read_input()
-for i in range(2):
-	ow_count, map_lines = scan_lines(wall)
-	rect = search_square(map_lines, num_rows, num_cols)
+for i in range(20):
+	row_count, map_lines = scan_lines(wall)
+	rect = search_rectangle(map_lines, num_rows, num_cols)
 	print rect
-	clear_rectangle(*rect)
-	for row in range(0, 10):
-		print wall[row][0:20]
+	print 'width', rect[1] - rect[0] + 1
+	print 'height', rect[3] - rect[2] + 1
 	print
+	clear_rectangle(*rect)
+	# for row in range(0, 10):
+	# 	print wall[row][0:20]
+	# print
 
