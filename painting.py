@@ -1,4 +1,4 @@
-input_file = 'right_angle.in'
+input_file = 'logo.in'
 output_file = 'right_angle.out'
 
 # Read input
@@ -80,21 +80,33 @@ def scan_columns(wall):
 	return col_count
 
 def search_rectangle(map_lines, num_rows, num_cols):
+	# print 'search_rectangle'
 	# print map_lines
-	left = 0
-	right = num_cols - 1
+	left = None
+	right = None
 	top = None
-	bottom = num_rows - 1
+	bottom = None
 	for row in range(num_rows):
 		list_lines = map_lines.get(row, None)
 		# print 'row'
 		# print list_lines
 		if list_lines:
+			first_line = list_lines[0]
+
 			if top == None:
 				top = row
+			if bottom == None:
+				bottom = row
+			if left == None:
+				left = first_line[0]
+			if right == None:
+				right = first_line[1]
+
 			# list_lines_above = map_lines.get(row - 1, None)	
-			list_lines_below = map_lines.get(row + 1, None)	
-			first_line = list_lines[0]
+			list_lines_below = map_lines.get(row + 1, [])	
+			# print 'list_lines_below', list_lines_below
+			# print left, right, top, bottom
+
 			updated = False
 			for (start_position, end_position) in list_lines_below:
 				if start_position >= left and start_position <= right:
@@ -114,12 +126,15 @@ def search_rectangle(map_lines, num_rows, num_cols):
 				# print 'start-end'
 				# print start_position, end_position
 				# print left, right, top, bottom
+			
 			if not updated:
 				return left, right, top, bottom
+	
 	return left, right, top, bottom
 
 def process_rectangle(map_lines, wall, l, r, t, b):
 	# print 'process_rectangle'
+	# print l, r, t, b
 	list_squares = []
 
 	w = r - l + 1
@@ -131,7 +146,7 @@ def process_rectangle(map_lines, wall, l, r, t, b):
 		# only need to draw at most 2 lines 
 		# if w < 3:
 		# TODO put into map_lines
-		clear_rectangle(l, r, t, b)
+		clear_rectangle(wall, l, r, t, b)
 	else:
 		if h > w:
 			# size of square must be an odd number
@@ -174,11 +189,11 @@ def process_rectangle(map_lines, wall, l, r, t, b):
 		radius = square[0]
 		center = square[1]
 		print 'square ' + str(radius) + ', ' + str(center)
-		clear_rectangle(center[0] - radius, center[0] + radius, center[1] - radius, center[1] + radius)
+		clear_rectangle(wall, center[0] - radius, center[0] + radius, center[1] - radius, center[1] + radius)
 
 	return list_squares
 
-def clear_rectangle(left, right, top, bottom):
+def clear_rectangle(wall, left, right, top, bottom):
 	for row in range(top, bottom + 1):
 		l = list(wall[row])
 		for col in range(left, right + 1):
@@ -204,16 +219,20 @@ def generate_output_file(map_lines, row_count, num_rows):
 # generate_output_file(map_lines, row_count, num_rows)
 
 wall, num_rows, num_cols = read_input()
-for i in range(100):
+while True:
+	# for row in range(0, num_rows):
+	# 	print wall[row][0:num_cols]
+	# print
 	row_count, map_lines = scan_lines(wall)
 	rect = search_rectangle(map_lines, num_rows, num_cols)
 	# print rect
 	# print 'width', rect[1] - rect[0] + 1
 	# print 'height', rect[3] - rect[2] + 1
-	process_rectangle(map_lines, wall, *rect)
-	print
-	# clear_rectangle(*rect)
-	# for row in range(0, 10):
-	# 	print wall[row][0:20]
+	if rect[0] != None and rect[1] != None and rect[2] != None and rect[3] != None:
+		process_rectangle(map_lines, wall, *rect)
+	else:
+		# no more rectangle found
+		break
 	# print
+	# clear_rectangle(*rect)
 
